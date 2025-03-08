@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import CustomButton from "../../Common/CustomButton";
 import CustomInput from "../../Common/CustomInput";
 import {
+  ClockCircleOutlined,
   DeleteOutlined,
   MinusCircleOutlined,
   PlusOutlined,
@@ -13,6 +14,7 @@ import axios from "axios";
 import { useCustomMessage } from "../../Common/CustomMessage";
 import { POST, POSTFILE } from "../../ApiFunction/ApiFunction";
 import CustomDropdown from "../../Common/CustomDropdown";
+import { action } from "../../Url/url";
 
 function AddCourse() {
   const showMessage = useCustomMessage();
@@ -119,9 +121,11 @@ function AddCourse() {
     } else if (video === null) {
       return showMessage("info", "video is required");
     }
+    setLoading(true);
     const token = sessionStorage.getItem("token");
     let formData = new FormData();
 
+    // Append normal fields to formData
     Object.keys(courseData).forEach((key) => {
       if (key === "rows") {
         // Handle rows separately
@@ -137,15 +141,19 @@ function AddCourse() {
       }
     });
 
+    // Append files (image and video) to formData
     if (image) formData.append("image", image);
     if (video) formData.append("video", video);
 
     try {
-      const response = await POSTFILE(
-        "http://localhost:3000/addcourse",
-        formData,
-        token
+      // Log formData before submission
+      console.log(
+        "FormData before submission:",
+        Object.fromEntries(formData.entries())
       );
+
+      const response = await POSTFILE(action.ADD_COURSE, formData, token);
+
       if (response.status === 200) {
         setLoading(false);
         showMessage("success", "Course added successfully");
@@ -163,6 +171,11 @@ function AddCourse() {
   const props = {
     image: {
       beforeUpload: (file) => {
+        if (file.size > 10 * 1024 * 1024) {
+          // 10MB
+          showMessage("info", "Image file size should be less than 10MB.");
+          return false;
+        }
         setImage(file);
         return false;
       },
@@ -174,6 +187,11 @@ function AddCourse() {
 
     video: {
       beforeUpload: (file) => {
+        if (file.size > 10 * 1024 * 1024) {
+          // 10MB
+          showMessage("info", "Video file size should be less than 10MB.");
+          return false;
+        }
         setVideo(file);
         return false;
       },
@@ -226,6 +244,11 @@ function AddCourse() {
                   className="w-full"
                   containerClassName="p-2 flex items-center gap-4"
                   type={type}
+                  suffix={
+                    key === "duration" && (
+                      <ClockCircleOutlined className="text-Primary" />
+                    )
+                  }
                   onChange={(e) =>
                     handleInputChange(
                       key,
@@ -371,7 +394,7 @@ function AddCourse() {
           />
         </Upload>
         <span className="text-red-500 mx-1 text-xs bg-red-50 rounded-md h-fit p-1">
-          required
+          {!image && "required"}
         </span>
       </div>
       <div className="flex gap-5 text-base p-2">
@@ -384,7 +407,7 @@ function AddCourse() {
           />
         </Upload>
         <span className="text-red-500 mx-1 text-xs bg-red-50 rounded-md h-fit p-1">
-          required
+          {!video && "required"}
         </span>
       </div>
       <div className="flex items-center gap-4">
@@ -392,7 +415,8 @@ function AddCourse() {
           <CustomButton
             title={v === "submit" ? "Submit" : "Cancel"}
             onClick={() => (v === "submit" ? handleSubmit() : navigate(-1))}
-            loading={loading}
+            loading={v === "submit" && loading}
+            disabled={v === "Cancel" && loading}
             variant="default"
             className={`py-5 font-bold tracking-wider w-fit text-white capitalize ${
               v === "submit" ? "bg-Primary" : "bg-gray-700"

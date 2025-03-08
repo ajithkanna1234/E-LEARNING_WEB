@@ -46,23 +46,23 @@ const courses = [
 
 const Course = () => {
   return (
-    <div className="w-[90%] mx-auto ">
-      <div className="md:w-full p-6 ">
+    <div className="w-full md:w-[95%] mx-auto ">
+      <div className="w-full md:p-2 ">
         <h1 className=" text-2xl md:text-3xl font-semibold mb-8 relative ">
           Popular Courses
         </h1>
 
-        <div className="flex flex-wrap justify-evenly gap-5">
+        <div className=" w-full grid grid-flow-col md:p-2 lg:flex justify-evenly gap-5 overflow-x-scroll md:overflow-hidden">
           {courses.length > 0 ? (
             courses.map((course) => (
               <div
                 key={course.id}
-                className="bg-white flex-col md:w-[280px] shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-blue-50"
+                className="bg-white flex-col shadow-md h-[300px] md:h-fit w-[250px] md:w-[280px] border-b-1 rounded-lg p-2 transition-transform  lg:hover:-translate-y-3 hover:shadow-md"
               >
                 <img
                   src={course.image}
                   alt={course.title}
-                  className="w-full h-48 object-contain rounded-md mb-4"
+                  className="w-full h-[170px] object-contain rounded-md mb-4"
                 />
                 <h2 className="text-xl font-semibold">{course.title}</h2>
                 <p className="text-gray-700">Instructor: {course.instructor}</p>
@@ -72,7 +72,7 @@ const Course = () => {
                 </p>
                 <Link
                   to={`/courses/${course.id}`}
-                  className="inline-block mt-4 text-blue-500"
+                  className="hidden md:inline-block md:mt-4 text-blue-500"
                 >
                   View Details
                 </Link>

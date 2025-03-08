@@ -13,6 +13,7 @@ import { Button, Upload } from "antd";
 import { useCustomMessage } from "../../Common/CustomMessage";
 import { PUTFILE } from "../../ApiFunction/ApiFunction";
 import CustomDropdown from "../../Common/CustomDropdown";
+import { action } from "../../Url/url";
 
 function EditCourse() {
   const expertiseLists = [
@@ -80,9 +81,6 @@ function EditCourse() {
     { label: "Rating", placeholder: "Enter rating", key: "rating" },
     { label: "Duration", placeholder: "Enter duration", key: "duration" },
   ];
-
-  const baseurl = "http://localhost:3000";
-  console.log("rating", editdata.imagePath);
 
   const navigate = useNavigate();
   let formData = new FormData();
@@ -173,10 +171,7 @@ function EditCourse() {
     const _id = data._id;
 
     try {
-      const result = await PUTFILE(
-        `http://localhost:3000/editcourse/${_id}`,
-        formData
-      );
+      const result = await PUTFILE(`${action.EDIT_COURSE}/${_id}`, formData);
 
       if (result.status === 200) {
         setLoading(false);
@@ -195,6 +190,11 @@ function EditCourse() {
   const props = {
     image: {
       beforeUpload: (file) => {
+        if (file.size > 10 * 1024 * 1024) {
+          // 10MB
+          showMessage("info", "Image file size should be less than 10MB.");
+          return false;
+        }
         setImage(file);
         return false;
       },
@@ -206,6 +206,11 @@ function EditCourse() {
 
     video: {
       beforeUpload: (file) => {
+        if (file.size > 10 * 1024 * 1024) {
+          // 10MB
+          showMessage("info", "Video file size should be less than 10MB.");
+          return false;
+        }
         setVideo(file);
         return false;
       },
@@ -214,7 +219,7 @@ function EditCourse() {
       },
     },
   };
-  console.log(editdata, "edit");
+
   return (
     <div className="grid gap-4 md:gap-6 lg:gap-8">
       <span className="text-xl border-b pb-4">Edit Course</span>

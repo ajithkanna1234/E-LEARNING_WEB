@@ -1,158 +1,219 @@
-const { log } = require("console");
 const courseDetails = require("../models/course.model");
 const instructorDetails = require("../models/instructorDetails.model");
+const Request = require("../models/Request.model");
+const cloudinary = require("../config/Cloudinary");
 const fs = require("fs");
 
+const uploadToCloudinary = (fileBuffer, folder, resourceType) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: folder,
+        resource_type: resourceType,
+      },
+      (error, result) => {
+        if (error) reject(error);
+        resolve(result);
+      }
+    );
+
+    uploadStream.end(fileBuffer);
+  });
+};
 
 const addCourse = async (req, res) => {
   try {
+    console.log("Course hit")
     const instructorId = req.userId;
     const insdata = await instructorDetails.findOne({ userId: instructorId });
-    // console.log(insdata);
-    const instructorName = insdata.name;
-    
-    const imagefile = req.files["image"] ? req.files["image"][0] : null;
-    const videofile = req.files["video"] ? req.files["video"][0] : null;
+    const instructorName = insdata.username;
+
     const data = {
       ...req.body,
       instructorId,
       instructorName,
     };
-    if (imagefile) {
-      data.imagePath = `/upload/${imagefile.filename}`,
-        data.imageName = imagefile.filename
+
+    const imageFile = req.files["image"] ? req.files["image"][0] : null;
+    const videoFile = req.files["video"] ? req.files["video"][0] : null;
+
+    if (imageFile) {
+      const imageResult = await uploadToCloudinary(
+        imageFile.buffer,
+        "coursefiles/images",
+        "image"
+      );
+
+      data.imagePath = imageResult.secure_url;
+      data.imageName = imageResult.public_id;
     }
-    if (videofile) {
-      data.videoPath = `/upload/${videofile.filename}`,
-        data.videoName = videofile.filename
+
+    if (videoFile) {
+      const videoResult = await uploadToCloudinary(
+        videoFile.buffer,
+        "coursefiles/videos",
+        "video"
+      );
+
+      data.videoPath = videoResult.secure_url;
+      data.videoName = videoResult.public_id;
     }
-    
-    const data1 = await courseDetails.create(data)
+
+    const newCourse = await courseDetails.create(data);
+
     res.json({
-      data,
+      data: newCourse,
       message: "New Course Added Successfully",
     });
   } catch (error) {
-    res.json(error.message);
+    console.error("Error occurred during course addition:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
-
-
+// UPDATE or EDIT an existing Course
 const editCourse = async (req, res) => {
   try {
     const { _id } = req.params;
-    const imagefile = req.files["image"] ? req.files["image"][0] : null;
-    const videofile = req.files["video"] ? req.files["video"][0] : null;
-    
+
+    const imageFile = req.files["image"] ? req.files["image"][0] : null;
+    const videoFile = req.files["video"] ? req.files["video"][0] : null;
+
     const oldData = await courseDetails.findById(_id);
     if (!oldData) {
-      return res.status(404).json({ messge: "data not found" });
+      return res.status(404).json({ message: "Course not found" });
     }
-    const newdata = {
+
+    const newData = {
       ...req.body,
+    };
+
+    if (imageFile) {
+      if (oldData.imageName) {
+        await cloudinary.uploader.destroy(oldData.imageName, {
+          resource_type: "image",
+        });
+      }
+
+      const imageResult = await uploadToCloudinary(
+        imageFile.buffer,
+        "coursefiles/images",
+        "image"
+      );
+      newData.imagePath = imageResult.secure_url;
+      newData.imageName = imageResult.public_id;
     }
 
-    if (imagefile && oldData.imageName) {
-    
-        fs.unlinkSync(`src/public/coursefiles/${oldData.imageName}`);
-        newdata.imagePath = `/upload/${imagefile.filename}`,
-        newdata.imageName = imagefile.filename    
+    if (videoFile) {
+      if (oldData.videoName) {
+        await cloudinary.uploader.destroy(oldData.videoName, {
+          resource_type: "video",
+        });
+      }
+
+      const videoResult = await uploadToCloudinary(
+        videoFile.buffer,
+        "coursefiles/videos",
+        "video"
+      );
+      newData.videoPath = videoResult.secure_url;
+      newData.videoName = videoResult.public_id;
     }
 
-    if (videofile && oldData.videoName) {
-      
-        fs.unlinkSync(`src/public/coursefiles/${oldData.videoName}`);
-        newdata.videoPath = `/upload/${videofile.filename}`,
-        newdata.videoName = videofile.filename
-    }
-
-    // console.log("success");
-
-    const updatedData = await courseDetails.findOneAndUpdate({ _id }, newdata, {
+    const updatedData = await courseDetails.findByIdAndUpdate(_id, newData, {
       new: true,
     });
+
     if (!updatedData) {
-      return res.status(403).json({ message: "no data found" });
+      return res.status(404).json({ message: "No data found" });
     }
+
     res.json({
       updatedData,
-      message: "Course edited Successfully",
+      message: "Course edited successfully",
     });
   } catch (error) {
-    res.json(error.message);
+    res.status(500).json(error.message);
   }
 };
 
-
-
-
+// GET all courses by Instructor
 const getCoursebyId = async (req, res) => {
   try {
     const instructorId = req.userId;
     const data = await courseDetails.find({ instructorId });
-
-    if (!data) {
-      return res.status(403).json({ message: "no data found" });
+    if (!data || data.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No courses found for this instructor" });
     }
     res.json(data);
   } catch (error) {
-    res.json(error.message);
+    res.status(500).json({ error: error.message });
   }
 };
 
-
-
+// GET all courses (Admin or public view)
 const getAllCourse = async (req, res) => {
   try {
     const data = await courseDetails.find();
-    if (!data) {
-      return res.status(403).json({ message: "no data found" });
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: "No courses found" });
     }
-    // console.log(data);
-    
     res.json(data);
   } catch (error) {
-    res.json(error.message);
+    res.status(500).json({ error: error.message });
   }
 };
 
-
-
+// GET a single course by _id
 const getCourse = async (req, res) => {
   try {
     const { _id } = req.params;
-    const data = await courseDetails.findOne({_id: _id });
-    console.log(data);
-
+    const data = await courseDetails.findOne({ _id });
     if (!data) {
-      return res.status(403).json({ message: "no data found" });
+      return res.status(404).json({ message: "No course found" });
     }
     res.json([data]);
   } catch (error) {
-    res.json(error.message);
+    res.status(500).json({ error: error.message });
   }
 };
 
+// DELETE a course
 const deleteCourse = async (req, res) => {
   try {
     const { _id } = req.params;
-    const data = await courseDetails.findById({ _id });
-    // console.log(data);
+    const data = await courseDetails.findById(_id);
+    if (!data) {
+      return res.status(404).json({ message: "Course not found" });
+    }
 
-    const data1 = await courseDetails.findByIdAndDelete(_id);
+    // Remove course from DB
+    await courseDetails.findByIdAndDelete(_id);
+
+    // If there is an image in Cloudinary, remove it
+    if (data.imageName) {
+      await cloudinary.uploader.destroy(data.imageName, {
+        resource_type: "auto",
+      });
+    }
+
+    // If there is a video in Cloudinary, remove it
+    if (data.videoName) {
+      await cloudinary.uploader.destroy(data.videoName, {
+        resource_type: "auto",
+      });
+    }
+
     res.json({
-      message: "course deleted successfully",
+      message: "Course deleted successfully",
     });
-    if (data.imageName && data.videoName) {
-      fs.unlinkSync(`src/public/coursefiles/${data.imageName}`);
-      fs.unlinkSync(`src/public/coursefiles/${data.videoName}`);
-    } 
   } catch (error) {
-    res.json(error.message);
+    res.status(500).json({ error: error.message });
   }
-
 };
+
 module.exports = {
   addCourse,
   editCourse,

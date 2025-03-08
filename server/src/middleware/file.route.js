@@ -1,27 +1,22 @@
 const express = require("express");
-const router = express.Router()
+const router = express.Router();
 const multer = require("multer");
-const {verifyToken} = require("../middleware/authToken")
-const courseCtrl = require("../controllers/courseManagement.controller")
+const { verifyToken } = require("../middleware/authToken");
+const courseCtrl = require("../controllers/courseManagement.controller");
 
-const storage = multer.diskStorage({
-  destination: "src/public/coursefiles/",
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+// Configure Multer to use Memory Storage
+const storage = multer.memoryStorage();
 
 const upload = multer({
-  storage
+  storage,
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB file size limit
 });
 
-const uploadFiles = upload.fields([{name:"image"},{name:"video"}])
+const uploadFiles = upload.fields([{ name: "image", maxCount: 1 }, { name: "video", maxCount: 1 }]);
 
-router.use(verifyToken) // Middleware to verify token
+router.use(verifyToken); // Middleware to verify token
 
-router.post("/addcourse",uploadFiles,courseCtrl.addCourse);         // Adds Course
-router.put("/editcourse/:_id",uploadFiles,courseCtrl.editCourse);   // Edit Course
-
-
+router.post("/addcourse", uploadFiles, courseCtrl.addCourse);
+router.put("/editcourse/:_id", uploadFiles, courseCtrl.editCourse); // Edit Course
 
 module.exports = router;

@@ -15,7 +15,7 @@ const CourseProfile = ({ courseData, allCourse, refresh = () => {} }) => {
         <div className="flex flex-wrap lg:flex-nowrap gap-4 h-full py-2">
           <div className="shadow p-4 rounded-md h-fit w-full lg:w-fit flex flex-col flex-wrap gap-4">
             {courseData?.map((v, i) => (
-              <div className="flex items-center gap-4 text-xs">
+              <div key={i} className="flex items-center gap-4 text-xs">
                 <span
                   className={`h-3 min-w-7`}
                   style={{ backgroundColor: v.color }}
@@ -24,8 +24,8 @@ const CourseProfile = ({ courseData, allCourse, refresh = () => {} }) => {
               </div>
             ))}
           </div>
-          <div className=" w-full grid gap-3 max-h-80 overflow-y-auto p-2 pt-0 relative">
-            <div className="top-0 sticky bg-white p-2">
+          <div className=" w-full flex flex-col gap-3 max-h-80 overflow-y-auto p-2 pt-0 relative">
+            <div className="top-0 sticky bg-white p-2 h-fit">
               <Link
                 to="/adminpanel/course"
                 className="text-Primary underline-offset-4 underline"
@@ -33,9 +33,11 @@ const CourseProfile = ({ courseData, allCourse, refresh = () => {} }) => {
                 view all courses
               </Link>
             </div>
-            {allCourse?.map((v) => (
+            {allCourse?.map((v, i) => (
               <ul className="text-xs bg-Primary/5 p-2">
-                <li className="px-2">{v.courseName}</li>
+                <li key={i} className="px-2 capitalize">
+                  {v.courseName}
+                </li>
               </ul>
             ))}
           </div>

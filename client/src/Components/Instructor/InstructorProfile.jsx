@@ -9,6 +9,8 @@ import CustomInput from "../Common/CustomInput";
 import { GET, PUT } from "../ApiFunction/ApiFunction";
 import { useCustomMessage } from "../Common/CustomMessage";
 import CustomProgressBar from "../Common/CustomProgressBar";
+import CustomAvatar from "../Common/CustomAvatar";
+import { action } from "../Url/url";
 
 const InstructorProfile = () => {
   const showMessage = useCustomMessage();
@@ -22,7 +24,7 @@ const InstructorProfile = () => {
   const [designation, setDesignation] = useState("");
   const [expertise, setExpertise] = useState("Programming");
   const fetchData = async () => {
-    const result = await GET("http://localhost:3000/getinsdata");
+    const result = await GET(action.GET_INS);
     if (result && result.length > 0) {
       const filteredData = result?.map((user) => ({
         username: user.username ? 10 : 0,
@@ -70,10 +72,7 @@ const InstructorProfile = () => {
     convertedObject.designation = designation;
     convertedObject.expertise = expertise;
     try {
-      const result = await PUT(
-        "http://localhost:3000/editinsdata",
-        convertedObject
-      );
+      const result = await PUT(action.EDIT_INS, convertedObject);
       if (result.status === 200) {
         setIsLoading(false);
         showMessage("success", "Data added Successfully");
@@ -84,8 +83,7 @@ const InstructorProfile = () => {
       setIsLoading(false);
     }
   };
-  console.log(data);
-  console.log(address);
+
   const options = [
     {
       label: "male",
@@ -137,7 +135,6 @@ const InstructorProfile = () => {
     },
   ];
   const onChange1 = ({ target: { value } }) => {
-    console.log("radio1 checked", value);
     setCheckBoxValue(value);
   };
   const handleInputChange = (title, value) => {
@@ -180,15 +177,16 @@ const InstructorProfile = () => {
 
   return (
     <div className="grid gap-4">
-      {" "}
-      <h1 className="lg:text-2xl text-base font-light text-gray-500 tracking-wide mb-4">
+      <h1 className="lg:text-2xl text-base font-light text-gray-500 tracking-wide">
         Details
       </h1>
-      <div className="shadow grid gap-4 rounded-lg p-4 min-h-24">
+      <div className="shadow grid gap-4 rounded-lg p-4 min-h-24 bg-gradient-to-tl from-Primary/10 to-transparent">
         <div className="flex items-center gap-4">
-          <Avatar className="bg-Primary/20 text-Primary" size={"large"}>
-            {data[0]?.username.charAt(0).toUpperCase()}
-          </Avatar>
+          <CustomAvatar
+            name={data[0]?.username}
+            imagepath={data[0]?.imagepath}
+            refresh={fetchData}
+          />
           <p className="grid">
             {data[0]?.username}
             <small className="text-xs text-gray-400">
@@ -210,17 +208,19 @@ const InstructorProfile = () => {
       </div>
       <div className=" flex items-center justify-between transition-all ">
         <span className="flex items-center">
-          <span className="mr-2 hidden lg:block text-gray-400">Edit</span>
+          <span className="lg:text-2xl text-base font-light text-gray-500 tracking-wide">
+            Edit
+          </span>
           <EditFilled
             onClick={() => setIsupdate(!isupdate)}
-            className="shadow duration-500 scale-100 hover:bg-Primary/10 hover:text-Primary p-2 rounded-full"
+            className="shadow duration-500 scale-100 bg-Primary/10 ml-4 text-Primary p-2 rounded-full"
           />
         </span>
       </div>
       {data.length > 0 ? (
         <form
           className="grid grid-cols-1 md:grid-cols-2
-         lg:grid-cols-4 gap-4 rounded-lg shadow border p-8 bg-white"
+         lg:grid-cols-4 gap-4 rounded-lg shadow p-8 bg-white"
         >
           {data.map((each) =>
             each.title
@@ -273,7 +273,7 @@ const InstructorProfile = () => {
               type="select"
               className="w-full"
               value={designation}
-              disabled={isupdate}
+              disabled={true}
               menus={designationLists}
               onChange={(e) => setDesignation(e)}
             />

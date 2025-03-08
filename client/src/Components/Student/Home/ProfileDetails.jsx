@@ -10,6 +10,7 @@ import CustomSkeleton from "../../Common/CustomSkeleton";
 import axios from "axios";
 import CustomDropdown from "../../Common/CustomDropdown";
 import { EditFilled, MailOutlined, PhoneOutlined } from "@ant-design/icons";
+import CustomAvatar from "../../Common/CustomAvatar";
 
 const ProfileDetails = () => {
   const showMessage = useCustomMessage();
@@ -60,7 +61,7 @@ const ProfileDetails = () => {
     try {
       const token = sessionStorage.getItem("token");
       if (token) {
-        const result = await axios.get("http://localhost:3000/getdata", {
+        const result = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/getdata`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setData(result.data);
@@ -113,7 +114,7 @@ const ProfileDetails = () => {
     convertedObject.designation = designation;
     try {
       const result = await PUT(
-        "http://localhost:3000/editdata",
+        `${process.env.REACT_APP_BACKEND_URL}/editdata`,
         convertedObject
       );
       if (result.status === 200) {
@@ -163,19 +164,21 @@ const ProfileDetails = () => {
   };
 
   return (
-    <form className=" lg:mx-auto rounded-lg grid gap-2 p-4 lg:p-6">
+    <form className=" lg:mx-auto grid gap-2 p-4 lg:p-6">
       <h1 className="lg:text-2xl text-base font-light text-gray-500 tracking-wide mb-4">
         Details
       </h1>
-      <div className="shadow grid gap-4 rounded-lg p-4 min-h-24">
+      <div className="shadow grid gap-4 rounded-lg p-4 min-h-24 bg-white">
         <div className="flex items-center gap-4">
-          <Avatar className="bg-Primary/20 text-Primary" size={"large"}>
-            {data[0]?.username.charAt(0).toUpperCase()}
-          </Avatar>
+          <CustomAvatar
+            name={data[0]?.username}
+            imagepath={data[0]?.imagepath}
+            refresh={fetchData}
+          />
           <p className="grid">
             {data[0]?.username}
             <small className="text-xs text-gray-400">
-              {data[0]?.designation}
+              {data[0]?.designation || "Student"}
             </small>
           </p>
         </div>
@@ -193,17 +196,19 @@ const ProfileDetails = () => {
       </div>
       <div className=" flex items-center justify-between transition-all ">
         <span className="flex items-center">
-          <span className="mr-2 hidden lg:block text-gray-400">Edit</span>
+          <span className="lg:text-2xl text-base font-light text-gray-500 tracking-wide">
+            Edit
+          </span>
           <EditFilled
             onClick={() => setIsupdate(!isupdate)}
-            className="shadow duration-500 scale-100 hover:bg-Primary/10 hover:text-Primary p-2 rounded-full"
+            className="shadow duration-500 scale-100 bg-white hover:bg-Primary/10 hover:text-Primary p-2 rounded-full"
           />
         </span>
       </div>
       {data.length > 0 ? (
         <div
-          className="grid grid-cols-1 mt-4 md:grid-cols-2
-          lg:grid-cols-4 gap-4 items-center rounded-lg border-2 p-8 bg-white"
+          className="grid grid-cols-1 md:grid-cols-2
+          lg:grid-cols-4 gap-4 items-center rounded-lg p-8 bg-white"
         >
           {data.map((each) =>
             each.title

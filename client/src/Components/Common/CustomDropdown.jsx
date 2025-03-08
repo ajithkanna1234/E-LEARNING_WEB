@@ -26,8 +26,8 @@ const CustomDropdown = ({
     key: menu.id,
     label: (
       <span
-        className={`lg:py-2 rounded-none text-gray-700 font-Poppins ${
-          menu.id === 6 && "text-red-500"
+        className={` rounded-none font-Poppins ${
+          menu.id === 6 && "text-red-500 "
         }`}
       >
         <Link to={menu.to} onClick={() => menu.id === 6 && CustomFunction()}>

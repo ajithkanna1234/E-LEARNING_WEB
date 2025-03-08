@@ -1,15 +1,16 @@
 import {
   AliwangwangOutlined,
   ContainerOutlined,
-  DashboardOutlined,
   LogoutOutlined,
   MenuOutlined,
+  SendOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { GET } from "../ApiFunction/ApiFunction";
+import { action } from "../Url/url";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -18,42 +19,46 @@ const AdminDashboard = () => {
   const [userData, setUserData] = useState("- - -");
 
   const fetchData = async () => {
-    const result = await GET("http://localhost:3000/admindetails");
-    if (result.length > 0) {
+    const result = await GET(action.ADMIN_DETAILS);
+    if (result?.length > 0) {
       setUserData(result[0]);
     }
   };
-  console.log(userData);
 
   useEffect(() => {
     fetchData();
   }, []);
-  console.log(menuId);
 
   const navList = [
     {
       id: 1,
       to: "/adminpanel",
       title: "Profile",
-      icon: <UserOutlined className="mr-2" />,
+      icon: <UserOutlined className="mr-2 text-Primary" />,
     },
     {
       id: 2,
       to: "/adminpanel/course",
       title: "Courses",
-      icon: <ContainerOutlined className="mr-2" />,
+      icon: <ContainerOutlined className="mr-2 text-Primary" />,
     },
     {
       id: 3,
       to: "/adminpanel/instructor",
       title: "Instructors",
-      icon: <AliwangwangOutlined className="mr-2" />,
+      icon: <AliwangwangOutlined className="mr-2 text-Primary" />,
     },
     {
       id: 4,
       to: "/adminpanel/student",
       title: "Students",
-      icon: <UserOutlined className="mr-2" />,
+      icon: <UserOutlined className="mr-2 text-Primary" />,
+    },
+    {
+      id: 5,
+      to: "/adminpanel/request",
+      title: "Requests",
+      icon: <SendOutlined className="mr-2 text-Primary" />,
     },
   ];
 
@@ -97,7 +102,7 @@ const AdminDashboard = () => {
         <h1 className="font-bold tracking-widest lg-text-lg p-4 bg-Primary flex text-white lg:w-fit items-center w-full">
           <MenuOutlined
             className={`mr-2 bg-gray-100/10 hover:bg-white ${
-              isMenuOpen && "bg-white text-black"
+              isMenuOpen && "bg-white !text-black"
             } hover:text-black transition-all duration-300 text-white rounded-full p-2`}
             onClick={handleMenuClick}
           />

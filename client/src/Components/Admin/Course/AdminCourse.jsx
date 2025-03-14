@@ -79,7 +79,7 @@ const AdminCourse = () => {
         <h1 className="lg:text-lg font-semibold text-gray-700 flex gap-2 ">
           All Courses
           <p className="rounded-full text-sm h-[30px] w-[30px] flex items-center justify-center bg-Primary text-white ">
-            {coursedata.length}
+            {coursedata?.length}
           </p>
         </h1>
         {/* <CustomButton
@@ -91,7 +91,7 @@ const AdminCourse = () => {
         /> */}
       </div>
       <div className="flex justify-end items-center flex-wrap gap-4">
-        {buttonOption.map((v, i) => (
+        {buttonOption?.map((v, i) => (
           <button
             key={i}
             className={`p-2 rounded text-xs border duration-500 transition-all`}

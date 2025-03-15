@@ -70,7 +70,7 @@ const Request = () => {
     const res = await DELETE(`${action.DEL_REQ}/${courseid}/${reqid}`);
     if (res.status === 200) {
       showMessage("success", res.data.message);
-      window.location.reload();
+      fetch();
     } else {
       showMessage("error", res.data.message);
     }

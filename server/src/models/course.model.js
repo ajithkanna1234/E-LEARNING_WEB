@@ -11,7 +11,7 @@ const courseSchema = new mongoose.Schema(
     courseType: String,
     subTopic: String,
     duration: String,
-    rating: String,
+    rating: { type: Number, default: 3 },
     price: String,
     rows: [
       {
@@ -24,7 +24,7 @@ const courseSchema = new mongoose.Schema(
     requirements: [String],
     instructorName: String,
     instructorId: String,
-    boughtBy:[String],
+    boughtBy: [String],
     imagePath: String,
     imageName: String,
     videoPath: String,

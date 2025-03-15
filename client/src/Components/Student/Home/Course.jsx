@@ -32,14 +32,16 @@ const Course = () => {
             data?.map((course) => (
               <div
                 key={course?.id}
-                className="bg-white flex-col shadow-md h-[300px] md:h-fit w-[250px] md:w-[280px] border-b-1 rounded-lg p-2 transition-transform  lg:hover:-translate-y-3 hover:shadow-md"
+                className="bg-white flex-col shadow-md h-[300px] md:h-fit w-[250px] md:w-[280px] border-b-1 rounded-lg p-2 hover:shadow-md"
               >
                 <img
                   src={course?.imagePath}
                   alt={course?.courseName}
                   className="w-full h-[170px] object-contain rounded-md mb-4"
                 />
-                <h2 className="text-xl font-semibold">{course?.courseName}</h2>
+                <h2 className="text-xl font-semibold truncate">
+                  {course?.courseName}
+                </h2>
                 <p className="text-gray-700">
                   Instructor: {course?.instructorName}
                 </p>

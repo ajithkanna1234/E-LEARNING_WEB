@@ -101,21 +101,23 @@ const CourseDetails = ({ data }) => {
                 {item?.courseName}
               </p>
               {item?.instructorDetails?.map((ins) => (
-                <div className="flex flex-col items-center gap-3 mr-auto rounded bg-gray-50 p-4">
+                <div className="flex items-center flex-col gap-3 rounded shadow p-4">
                   <CustomAvatar
                     editable={false}
                     name={ins?.username}
                     imagepath={ins?.imagepath}
                     className="md:size-24"
                   />
-                  <p className="text-Primary capitalize bg-white p-2">
-                    <span className="text-gray-500">Instructor : </span>
-                    {ins?.username}
-                  </p>
-                  <small>
-                    <PhoneOutlined className="text-Primary mr-2" />
-                    {ins?.phonenumber}
-                  </small>
+                  <div className="grid gap-3">
+                    <p className="text-Primary capitalize bg-white p-2">
+                      <span className="text-gray-500">Instructor : </span>
+                      {ins?.username}
+                    </p>
+                    <small>
+                      <PhoneOutlined className="text-Primary mr-2" />
+                      {ins?.phonenumber}
+                    </small>
+                  </div>
                 </div>
               ))}
               <p className="text-xs md:text-sm text-Primary">Requirements</p>

@@ -14,14 +14,14 @@ import axios from "axios";
 import { action } from "../../Url/url";
 import CustomAvatar from "../../Common/CustomAvatar";
 
-// Replace with your own Stripe public key
+
 
 const CourseDetails = ({ data }) => {
   const { _id } = useParams();
   const navigate = useNavigate();
   const [temp, setTemp] = useState([]);
 
-  // Load Stripe outside of a component’s render to avoid reloading the Stripe object
+
   const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
   const getCourse = async () => {
@@ -101,23 +101,21 @@ const CourseDetails = ({ data }) => {
                 {item?.courseName}
               </p>
               {item?.instructorDetails?.map((ins) => (
-                <div className="flex items-center flex-col gap-3 rounded shadow p-4">
+                <div className="flex flex-col items-center gap-3 mr-auto rounded bg-gray-50 p-4">
                   <CustomAvatar
                     editable={false}
                     name={ins?.username}
                     imagepath={ins?.imagepath}
                     className="md:size-24"
                   />
-                  <div className="grid gap-3">
-                    <p className="text-Primary capitalize bg-white p-2">
-                      <span className="text-gray-500">Instructor : </span>
-                      {ins?.username}
-                    </p>
-                    <small>
-                      <PhoneOutlined className="text-Primary mr-2" />
-                      {ins?.phonenumber}
-                    </small>
-                  </div>
+                  <p className="text-Primary capitalize bg-white p-2">
+                    <span className="text-gray-500">Instructor : </span>
+                    {ins?.username}
+                  </p>
+                  <small>
+                    <PhoneOutlined className="text-Primary mr-2" />
+                    {ins?.phonenumber}
+                  </small>
                 </div>
               ))}
               <p className="text-xs md:text-sm text-Primary">Requirements</p>

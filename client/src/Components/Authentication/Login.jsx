@@ -47,11 +47,11 @@ const Login = () => {
         // showMessage("success", result?.data?.message);
         navigate(result?.data?.navigate);
       } else {
-        showMessage("error", "Invalid email ID or password");
+        showMessage("error", "Invalid email id or password");
       }
     } catch (error) {
       setLoading(false);
-      showMessage("error", "Invalid email ID or password");
+      showMessage("error", "Invalid email id or password");
     }
   };
 

@@ -3,9 +3,10 @@ import CustomTable from "../../Common/CustomTable";
 import { DELETE, GET } from "../../ApiFunction/ApiFunction";
 import { useCustomMessage } from "../../Common/CustomMessage";
 import { action } from "../../Url/url";
-const Request = () => {
+const InstructorRequest = () => {
   const [request, setRequest] = useState([]);
   const showMessage = useCustomMessage();
+
   const fetch = async () => {
     const res = await GET(action.GET_REQ);
     setRequest(res);
@@ -70,7 +71,6 @@ const Request = () => {
     const res = await DELETE(`${action.DEL_REQ}/${courseid}/${reqid}`);
     if (res.status === 200) {
       showMessage("success", res.data.message);
-      window.location.reload();
     } else {
       showMessage("error", res.data.message);
     }
@@ -79,17 +79,17 @@ const Request = () => {
 
   return (
     <div className="grid gap-4">
-      <h1 className="lg:text-lg font-semibold text-gray-700 flex gap-2 ">
-        Request{" "}
+      <h1 className="lg:text-lg font-semibold text-gray-700 tracking-wide flex gap-2">
+        Requests{" "}
         <p className="rounded-full text-sm h-[30px] w-[30px] flex items-center justify-center bg-Primary text-white ">
-          {request?.length}
+          {request.length}
         </p>
       </h1>
       <CustomTable
         columns={header}
         data={request}
         approveBtn
-        viewModal={(v, i, view) => {
+        viewModal={(v, i) => {
           handleRequest(i, v);
         }}
       />
@@ -97,4 +97,4 @@ const Request = () => {
   );
 };
 
-export default Request;
+export default InstructorRequest;

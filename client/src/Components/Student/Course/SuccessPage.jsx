@@ -10,12 +10,11 @@ const Success = () => {
 
   useEffect(() => {
     const fetchSessionDetails = async () => {
+      console.log(courseId);
+      
       if (sessionId) {
         try {
-          const response = await GET(
-            `${process.env.REACT_APP_BACKEND_URL}/checkout-session/${sessionId}`,
-            { courseId: courseId }
-          );
+          const response = await GET(`${process.env.REACT_APP_BACKEND_URL}/checkout-session/${sessionId}`,{courseId:courseId});
           setSessionDetails(response.data);
         } catch (error) {
           console.error("Error fetching session details:", error);
@@ -24,7 +23,6 @@ const Success = () => {
     };
     fetchSessionDetails();
   }, [sessionId]);
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
       <h1 className="text-4xl font-semibold text-green-600">

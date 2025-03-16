@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { GET } from "../ApiFunction/ApiFunction";
 import { action } from "../Url/url";
+import confirm from "antd/es/modal/confirm";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -91,8 +92,20 @@ const AdminDashboard = () => {
     sessionStorage.clear();
     navigate("/login");
   };
-  console.log(menuId);
-
+  const showConfirm = () => {
+    confirm({
+      title: "Are you sure you want to logout ?",
+      icon: null,
+      content: null,
+      onOk() {
+        handleSignOut();
+      },
+      okButtonProps: {
+        className: "bg-red-500",
+      },
+      okText: "Logout",
+    });
+  };
   return (
     <div
       className={`flex flex-col lg:flex-row h-screen w-screen ${
@@ -110,7 +123,7 @@ const AdminDashboard = () => {
           <span className={` lg:hidden`}>Dashboard</span>
           <LogoutOutlined
             className="text-white ml-auto lg:hidden bg-red-500 p-2 rounded-full"
-            onClick={handleSignOut}
+            onClick={showConfirm}
           />
         </h1>
         <motion.div
@@ -153,7 +166,7 @@ const AdminDashboard = () => {
           </h1>
           <LogoutOutlined
             className="text-white hidden lg:block bg-red-500 p-1 rounded-full"
-            onClick={handleSignOut}
+            onClick={showConfirm}
           />
         </div>
         <motion.div className="bg-white md:m-3 mr-0 shadow-lg rounded-lg md:p-4 p-2 overflow-y-auto">
